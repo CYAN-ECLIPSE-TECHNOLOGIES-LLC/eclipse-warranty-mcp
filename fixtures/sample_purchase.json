@@ -1,0 +1,1 @@
+{"buyer_mandate_ref":"mandate:fixture-buyer-001","holder_ref":"holder:alice","note":"Fixture seed only — caller-supplied purchase record for LOCAL/fixture scope. Not a real purchase.","product_ref":"fixture:widget-pro-x1","purchase_ts":"2026-10-20T14:03:00Z","retailer_receipt_ref":"receipt:fixture-retailer-8842","serial":"SN-FIXTURE-0001"}
