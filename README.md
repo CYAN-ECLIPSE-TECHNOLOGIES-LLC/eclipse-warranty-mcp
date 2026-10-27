@@ -2,7 +2,7 @@
 
 Warranty registration witness for agent purchases — binds serial, buyer mandate, and retailer receipt into one transferable claim pack.
 
-**Status: v0.1.1 — bench fix round D1/D2 applied (full-content seal + strict pack structure; advertised schemas enforced at dispatch), re-bench pending.** Spec: `SPEC.md` (see its Bench Fix addendum). Scope: **LOCAL / fixture**.
+**Status: v0.1.1 — CERTIFIED (local, fixture)** (Verity re-bench 1, 2026-10-26: 95 asserted PASS / 0 FAIL; D1 full-content seal + D2 schema enforcement closed; prior v0.1.0 verdict CONDITIONAL). Spec: `SPEC.md` (see its Bench Fix addendum — v0.1.0-sealed packs verify INVALID under v0.1.1; fixture packs are re-registered, no migration). Scope: **LOCAL / fixture**.
 
 ## Novel mechanism
 
