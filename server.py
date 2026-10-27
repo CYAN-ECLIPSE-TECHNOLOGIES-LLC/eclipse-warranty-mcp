@@ -84,6 +84,33 @@ TOOLS = {
 }
 
 
+def _validate_args(name, schema, args):
+    """Bench Fix D2: enforce the advertised input schema at dispatch —
+    required fields present, declared types exact (no str() coercion:
+    an int/list where a string is declared is a validation error),
+    and no extra keys when additionalProperties is false."""
+    props = schema.get("properties", {})
+    if schema.get("additionalProperties") is False:
+        unknown = sorted(set(args) - set(props))
+        if unknown:
+            raise ToolError(
+                "unknown argument(s) for " + name + ": "
+                + ",".join(unknown)
+                + " (additionalProperties: false)")
+    missing = [k for k in schema.get("required", []) if k not in args]
+    if missing:
+        raise ToolError("missing required argument(s) for " + name
+                        + ": " + ",".join(missing))
+    for key, value in args.items():
+        declared = props.get(key, {}).get("type")
+        if declared == "string" and not isinstance(value, str):
+            raise ToolError("argument " + key + " for " + name
+                            + " must be a string")
+        if declared == "object" and not isinstance(value, dict):
+            raise ToolError("argument " + key + " for " + name
+                            + " must be an object")
+
+
 def dispatch(name, args):
     if name not in TOOLS:
         raise Refusal(
@@ -92,6 +119,7 @@ def dispatch(name, args):
             "warranty registrations only; it adjudicates nothing.")
     if not isinstance(args, dict):
         raise ToolError("arguments must be an object")
+    _validate_args(name, TOOLS[name]["schema"], args)
     return TOOLS[name]["fn"](args)
 
 

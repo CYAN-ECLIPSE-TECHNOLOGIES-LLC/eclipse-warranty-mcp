@@ -31,3 +31,21 @@ Novel mechanism implemented as specced (SPEC §3): transferability derives from 
 
 SPEC.md · README.md · server.json · LICENSE (MIT) · config.py · errors.py · warranty.py · server.py · tests/test_warranty.py · fixtures/sample_purchase.json · .gitignore (data/, __pycache__, *.env, keys/)
 SPEC copy: `~/workspace/cyan-eclipse/argus-batch-20261026/specs/eclipse-warranty-mcp-SPEC.md`
+
+---
+
+# FIX ROUND — v0.1.1 (2026-10-26)
+
+**Trigger:** Verity bench of v0.1.0 (`2ec6310`) — CONDITIONAL (local, fixture); defects D1 (MEDIUM, unsealed-field injection) + D2 (LOW, advertised schemas unenforced). Fix conditions C1 + C2. Builder: Silas (W-002). Re-bench is Verity's; no self-certification.
+
+## Changes
+
+- **C1 / D1 — `warranty.py`:** seal now covers the complete pack object minus the `seal` field (was: projection of the 5 binding fields + holder + transfers + prev_hash). Added `pack_structure_errors()`: verify returns INVALID for keys outside the specced top-level/binding/transfer field sets, missing fields, non-string values, or `scope`/`seal_type` outside the spec vocabulary (scope ∈ {`LOCAL/fixture`}). `verify_pack` maps a stored pack's structural refusal to an INVALID verdict (not a transport error); `get_pack` refuses structurally out-of-spec packs with `PACK_INVALID` instead of serving injected/relabelled content. v0.1.0-sealed packs verify INVALID under the new seal (fixture scope; re-register, no migration).
+- **C2 / D2 — `server.py` + `warranty.py`:** `dispatch` validates args against the advertised schemas (required present, exact declared types, extra keys rejected per `additionalProperties: false`) before invoking a tool; store methods type-check string fields and no longer coerce via `str()`.
+- **Version:** `TOOL_VERSION` + `server.json` 0.1.0 → 0.1.1. SPEC addendum "Bench Fix D1/D2" appended (original spec text untouched).
+
+## Verification at fix
+
+- Suite: **28/28 pass** (`python3 -m unittest discover -s tests`) — 14 pre-existing + 14 regression tests replicating both bench repros at store level and over stdio JSON-RPC (injected bindings/top-level/transfer keys, scope relabel, `registered_at` tamper, int `purchase_ts`, list `serial`, extra arg fields, wrong types on other tools).
+- Independent bench re-run locally for regression only (`bench_warranty.py`, Verity's suite, unmodified): 67/67 asserted probes PASS, 0 hard fails; all 5 former OBS defect observations no longer reproduce (injected key / scope relabel no longer verify; int/list/extra args now clean errors). Formal re-bench + verdict remain Verity's.
+- No new secret material; demo-key mechanism unchanged (runtime-generated, gitignored, 0600).
